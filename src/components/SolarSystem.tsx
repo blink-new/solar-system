@@ -1,6 +1,6 @@
 import { useRef, Suspense } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Text, Html, useProgress } from '@react-three/drei';
+import { Text, Html, useProgress, PointMaterial } from '@react-three/drei';
 import { usePlanets } from '../context/PlanetContext';
 import Planet from './Planet';
 import { ViewType } from '../types';
@@ -23,6 +23,64 @@ function Loader() {
         <p className="text-lg font-semibold">{progress.toFixed(0)}% loaded</p>
       </div>
     </Html>
+  );
+}
+
+// Star field component for background
+function StarField({ count = 5000 }) {
+  const positions = useRef<Float32Array>(new Float32Array(count * 3));
+  const sizes = useRef<Float32Array>(new Float32Array(count));
+  
+  // Generate random star positions and sizes
+  if (positions.current.length > 0) {
+    for (let i = 0; i < count; i++) {
+      const i3 = i * 3;
+      positions.current[i3] = (Math.random() - 0.5) * 300;
+      positions.current[i3 + 1] = (Math.random() - 0.5) * 300;
+      positions.current[i3 + 2] = (Math.random() - 0.5) * 300;
+      sizes.current[i] = Math.random() * 1.5;
+    }
+  }
+  
+  return (
+    <points>
+      <bufferGeometry>
+        <bufferAttribute
+          attach="attributes-position"
+          count={count}
+          array={positions.current}
+          itemSize={3}
+        />
+        <bufferAttribute
+          attach="attributes-size"
+          count={count}
+          array={sizes.current}
+          itemSize={1}
+        />
+      </bufferGeometry>
+      <pointsMaterial
+        size={1}
+        sizeAttenuation
+        transparent
+        color="#FFFFFF"
+        opacity={0.8}
+      />
+    </points>
+  );
+}
+
+// Orbit path component
+function OrbitPath({ radius, color }: { radius: number; color: string }) {
+  return (
+    <mesh rotation={[Math.PI / 2, 0, 0]}>
+      <ringGeometry args={[radius - 0.025, radius + 0.025, 128]} />
+      <meshBasicMaterial 
+        color={color} 
+        opacity={0.3} 
+        transparent 
+        side={THREE.DoubleSide} 
+      />
+    </mesh>
   );
 }
 
@@ -60,6 +118,19 @@ const SolarSystem = ({
 
   return (
     <Suspense fallback={<Loader />}>
+      {/* Ambient light for base illumination */}
+      <ambientLight intensity={0.3} />
+      
+      {/* Main light source at the center (sun) */}
+      <pointLight position={[0, 0, 0]} intensity={3} color="#FDB813" distance={100} decay={0.5} />
+      
+      {/* Secondary lights for better visibility */}
+      <pointLight position={[20, 20, 20]} intensity={0.5} color="#FFFFFF" />
+      <pointLight position={[-20, -20, -20]} intensity={0.3} color="#FFF4E0" />
+      
+      {/* Background stars */}
+      <StarField count={7000} />
+      
       <group ref={groupRef}>
         {/* Sun at the center */}
         <Planet 
@@ -80,10 +151,7 @@ const SolarSystem = ({
             <group key={planet.id}>
               {/* Orbit path */}
               {showOrbits && (
-                <mesh rotation={[Math.PI / 2, 0, 0]}>
-                  <ringGeometry args={[orbitRadius - 0.025, orbitRadius + 0.025, 64]} />
-                  <meshBasicMaterial color={planet.color} opacity={0.3} transparent side={THREE.DoubleSide} />
-                </mesh>
+                <OrbitPath radius={orbitRadius} color={planet.color} />
               )}
               
               {/* Planet with orbit animation */}

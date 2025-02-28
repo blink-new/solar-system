@@ -14,7 +14,7 @@ function App() {
   const [view, setView] = useState<'system' | 'detail' | 'quiz'>('system');
   const [selectedPlanet, setSelectedPlanet] = useState<string | null>(null);
   const [showOrbits, setShowOrbits] = useState(true);
-  const [isNightMode, setIsNightMode] = useState(false);
+  const [isNightMode, setIsNightMode] = useState(true); // Default to night mode for better visuals
   const [isRealisticScale, setIsRealisticScale] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -33,7 +33,7 @@ function App() {
         <Toaster position="top-center" />
         
         {isLoading ? (
-          <div className="w-full h-screen flex flex-col items-center justify-center">
+          <div className="w-full h-screen flex flex-col items-center justify-center bg-black">
             <div className="w-24 h-24 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin mb-6"></div>
             <h1 className="text-2xl font-bold text-white mb-2">Loading Solar System</h1>
             <p className="text-gray-300">Preparing for your cosmic journey...</p>
@@ -61,22 +61,33 @@ function App() {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.5 }}
                 >
-                  <Canvas camera={{ position: [0, 20, 25], fov: 60 }}>
-                    <ambientLight intensity={isNightMode ? 0.1 : 0.5} />
-                    <pointLight position={[0, 0, 0]} intensity={isNightMode ? 5 : 10} color="#FDB813" />
-                    <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
+                  <Canvas 
+                    camera={{ position: [0, 20, 25], fov: 60 }}
+                    gl={{ 
+                      antialias: true,
+                      alpha: true,
+                      logarithmicDepthBuffer: true
+                    }}
+                    shadows
+                  >
+                    <color attach="background" args={[isNightMode ? '#000000' : '#0c0f2d']} />
+                    <fog attach="fog" args={[isNightMode ? '#000000' : '#0c0f2d', 30, 100]} />
+                    
                     <SolarSystem 
                       setSelectedPlanet={setSelectedPlanet} 
                       setView={setView} 
                       showOrbits={showOrbits}
                       isRealisticScale={isRealisticScale}
                     />
+                    
                     <OrbitControls 
                       enablePan={true}
                       enableZoom={true}
                       enableRotate={true}
                       minDistance={5}
                       maxDistance={100}
+                      dampingFactor={0.1}
+                      rotateSpeed={0.5}
                     />
                   </Canvas>
                 </motion.div>

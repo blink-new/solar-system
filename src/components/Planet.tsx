@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
@@ -58,7 +58,14 @@ const Planet = ({
       return (
         <mesh rotation={[Math.PI / 2, 0, 0]}>
           <ringGeometry args={[getPlanetSize() * 1.4, getPlanetSize() * 2, 64]} />
-          <meshStandardMaterial color="#E4D191" opacity={0.7} transparent />
+          <meshStandardMaterial 
+            color="#E4D191" 
+            opacity={0.7} 
+            transparent 
+            side={THREE.DoubleSide}
+            metalness={0.4}
+            roughness={0.6}
+          />
         </mesh>
       );
     }
@@ -71,7 +78,14 @@ const Planet = ({
       return (
         <mesh rotation={[Math.PI / 2, 0, 0]}>
           <ringGeometry args={[getPlanetSize() * 1.2, getPlanetSize() * 1.5, 64]} />
-          <meshStandardMaterial color={planet.color} opacity={0.3} transparent />
+          <meshStandardMaterial 
+            color={planet.color} 
+            opacity={0.4} 
+            transparent 
+            side={THREE.DoubleSide}
+            metalness={0.3}
+            roughness={0.7}
+          />
         </mesh>
       );
     }
@@ -82,13 +96,90 @@ const Planet = ({
   const renderSunGlow = () => {
     if (planet.id === 'sun') {
       return (
+        <>
+          {/* Inner glow */}
+          <mesh>
+            <sphereGeometry args={[getPlanetSize() * 1.1, 32, 32]} />
+            <meshBasicMaterial color="#FFF4E0" opacity={0.3} transparent />
+          </mesh>
+          {/* Outer glow */}
+          <mesh>
+            <sphereGeometry args={[getPlanetSize() * 1.3, 32, 32]} />
+            <meshBasicMaterial color="#FDB813" opacity={0.1} transparent />
+          </mesh>
+        </>
+      );
+    }
+    return null;
+  };
+
+  // Add atmosphere for terrestrial planets
+  const renderAtmosphere = () => {
+    if (['earth', 'venus', 'mars', 'uranus', 'neptune'].includes(planet.id)) {
+      const atmosphereColors = {
+        'earth': '#88BFFF',
+        'venus': '#FFF0B5',
+        'mars': '#FFD2B5',
+        'uranus': '#D1E7E7',
+        'neptune': '#5B5DDF'
+      };
+      
+      const color = atmosphereColors[planet.id as keyof typeof atmosphereColors] || '#FFFFFF';
+      
+      return (
         <mesh>
-          <sphereGeometry args={[getPlanetSize() * 1.2, 32, 32]} />
-          <meshBasicMaterial color="#FDB813" opacity={0.2} transparent />
+          <sphereGeometry args={[getPlanetSize() * 1.05, 32, 32]} />
+          <meshBasicMaterial color={color} opacity={0.2} transparent />
         </mesh>
       );
     }
     return null;
+  };
+
+  // Add surface details and texture-like effects
+  const getPlanetMaterial = () => {
+    if (planet.id === 'sun') {
+      return (
+        <meshBasicMaterial 
+          color={planet.color}
+          emissive={planet.color}
+          emissiveIntensity={1}
+        />
+      );
+    } else if (['jupiter', 'saturn'].includes(planet.id)) {
+      // Gas giants with bands
+      return (
+        <meshStandardMaterial 
+          color={planet.color}
+          metalness={0.1}
+          roughness={0.8}
+          emissive={planet.color}
+          emissiveIntensity={0.05}
+        />
+      );
+    } else if (['uranus', 'neptune'].includes(planet.id)) {
+      // Ice giants
+      return (
+        <meshStandardMaterial 
+          color={planet.color}
+          metalness={0.3}
+          roughness={0.6}
+          emissive={planet.color}
+          emissiveIntensity={0.1}
+        />
+      );
+    } else {
+      // Terrestrial planets
+      return (
+        <meshStandardMaterial 
+          color={planet.color}
+          metalness={0.2}
+          roughness={0.9}
+          emissive={planet.color}
+          emissiveIntensity={0.02}
+        />
+      );
+    }
   };
 
   return (
@@ -101,20 +192,9 @@ const Planet = ({
         scale={hovered ? [1.1, 1.1, 1.1] : [1, 1, 1]}
       >
         <sphereGeometry args={[getPlanetSize(), 32, 32]} />
-        {planet.id === 'sun' ? (
-          <meshBasicMaterial 
-            color={planet.color}
-            emissive={planet.color}
-            emissiveIntensity={0.5}
-          />
-        ) : (
-          <meshStandardMaterial 
-            color={planet.color}
-            metalness={0.2}
-            roughness={0.8}
-          />
-        )}
+        {getPlanetMaterial()}
       </mesh>
+      {renderAtmosphere()}
       {renderSaturnRings()}
       {renderPlanetaryRings()}
       {renderSunGlow()}
