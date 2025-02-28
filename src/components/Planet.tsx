@@ -1,7 +1,6 @@
-import { useRef, useState, useEffect } from 'react';
-import { useFrame, useLoader } from '@react-three/fiber';
+import { useRef, useState } from 'react';
+import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { TextureLoader } from 'three/src/loaders/TextureLoader';
 
 import { Planet as PlanetType } from '../types';
 
@@ -22,22 +21,6 @@ const Planet = ({
 }: PlanetProps) => {
   const meshRef = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
-  
-  // Planet texture mapping
-  const planetTextures: Record<string, string> = {
-    'sun': 'https://images.unsplash.com/photo-1575881875475-31023242e3f9?q=80&w=500&auto=format&fit=crop',
-    'mercury': 'https://images.unsplash.com/photo-1614732414444-096e5f1122d5?q=80&w=500&auto=format&fit=crop',
-    'venus': 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=500&auto=format&fit=crop',
-    'earth': 'https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?q=80&w=500&auto=format&fit=crop',
-    'mars': 'https://images.unsplash.com/photo-1573588028698-f4759befb09a?q=80&w=500&auto=format&fit=crop',
-    'jupiter': 'https://images.unsplash.com/photo-1630839437035-dac17da580d0?q=80&w=500&auto=format&fit=crop',
-    'saturn': 'https://images.unsplash.com/photo-1614314107768-6018061e5704?q=80&w=500&auto=format&fit=crop',
-    'uranus': 'https://images.unsplash.com/photo-1614313913007-2b4ae8ce32d6?q=80&w=500&auto=format&fit=crop',
-    'neptune': 'https://images.unsplash.com/photo-1614314107918-2163bd6c0b90?q=80&w=500&auto=format&fit=crop'
-  };
-
-  // Load texture
-  const texture = useLoader(TextureLoader, planetTextures[planet.id]);
   
   // Calculate planet size
   const getPlanetSize = () => {
@@ -120,13 +103,13 @@ const Planet = ({
         <sphereGeometry args={[getPlanetSize(), 32, 32]} />
         {planet.id === 'sun' ? (
           <meshBasicMaterial 
-            map={texture}
+            color={planet.color}
             emissive={planet.color}
             emissiveIntensity={0.5}
           />
         ) : (
           <meshStandardMaterial 
-            map={texture}
+            color={planet.color}
             metalness={0.2}
             roughness={0.8}
           />
