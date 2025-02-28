@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Stars } from '@react-three/drei';
+import { OrbitControls } from '@react-three/drei';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Toaster } from 'react-hot-toast';
 import SolarSystem from './components/SolarSystem';
@@ -29,7 +29,7 @@ function App() {
 
   return (
     <PlanetProvider>
-      <div className={`app-container min-h-screen ${isNightMode ? 'bg-gray-900' : 'bg-indigo-950'}`}>
+      <div className={`app-container min-h-screen ${isNightMode ? 'bg-black' : 'bg-indigo-950'}`}>
         <Toaster position="top-center" />
         
         {isLoading ? (
@@ -62,16 +62,20 @@ function App() {
                   transition={{ duration: 0.5 }}
                 >
                   <Canvas 
-                    camera={{ position: [0, 20, 25], fov: 60 }}
+                    camera={{ 
+                      position: [0, 30, 40], 
+                      fov: 50,
+                      near: 0.1,
+                      far: 1000
+                    }}
                     gl={{ 
                       antialias: true,
-                      alpha: true,
-                      logarithmicDepthBuffer: true
+                      alpha: false,
+                      powerPreference: "high-performance"
                     }}
-                    shadows
+                    dpr={[1, 2]} // Responsive pixel ratio
                   >
-                    <color attach="background" args={[isNightMode ? '#000000' : '#0c0f2d']} />
-                    <fog attach="fog" args={[isNightMode ? '#000000' : '#0c0f2d', 30, 100]} />
+                    <color attach="background" args={['#000000']} />
                     
                     <SolarSystem 
                       setSelectedPlanet={setSelectedPlanet} 
@@ -84,10 +88,11 @@ function App() {
                       enablePan={true}
                       enableZoom={true}
                       enableRotate={true}
-                      minDistance={5}
+                      minDistance={10}
                       maxDistance={100}
                       dampingFactor={0.1}
                       rotateSpeed={0.5}
+                      zoomSpeed={0.8}
                     />
                   </Canvas>
                 </motion.div>

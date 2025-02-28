@@ -1,6 +1,6 @@
 import { useRef, Suspense } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Text, Html, useProgress, PointMaterial } from '@react-three/drei';
+import { Text, Html, useProgress, Stars } from '@react-three/drei';
 import { usePlanets } from '../context/PlanetContext';
 import Planet from './Planet';
 import { ViewType } from '../types';
@@ -26,49 +26,6 @@ function Loader() {
   );
 }
 
-// Star field component for background
-function StarField({ count = 5000 }) {
-  const positions = useRef<Float32Array>(new Float32Array(count * 3));
-  const sizes = useRef<Float32Array>(new Float32Array(count));
-  
-  // Generate random star positions and sizes
-  if (positions.current.length > 0) {
-    for (let i = 0; i < count; i++) {
-      const i3 = i * 3;
-      positions.current[i3] = (Math.random() - 0.5) * 300;
-      positions.current[i3 + 1] = (Math.random() - 0.5) * 300;
-      positions.current[i3 + 2] = (Math.random() - 0.5) * 300;
-      sizes.current[i] = Math.random() * 1.5;
-    }
-  }
-  
-  return (
-    <points>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          count={count}
-          array={positions.current}
-          itemSize={3}
-        />
-        <bufferAttribute
-          attach="attributes-size"
-          count={count}
-          array={sizes.current}
-          itemSize={1}
-        />
-      </bufferGeometry>
-      <pointsMaterial
-        size={1}
-        sizeAttenuation
-        transparent
-        color="#FFFFFF"
-        opacity={0.8}
-      />
-    </points>
-  );
-}
-
 // Orbit path component
 function OrbitPath({ radius, color }: { radius: number; color: string }) {
   return (
@@ -76,7 +33,7 @@ function OrbitPath({ radius, color }: { radius: number; color: string }) {
       <ringGeometry args={[radius - 0.025, radius + 0.025, 128]} />
       <meshBasicMaterial 
         color={color} 
-        opacity={0.3} 
+        opacity={0.4} 
         transparent 
         side={THREE.DoubleSide} 
       />
@@ -96,7 +53,7 @@ const SolarSystem = ({
   useFrame(({ clock }) => {
     if (groupRef.current) {
       // Slow rotation of the entire system for visual effect
-      groupRef.current.rotation.y = clock.getElapsedTime() * 0.05;
+      groupRef.current.rotation.y = clock.getElapsedTime() * 0.03;
     }
   });
 
@@ -112,24 +69,31 @@ const SolarSystem = ({
       return position * position * 1.5;
     } else {
       // Visually pleasing spacing
-      return position * 4;
+      return position * 5;
     }
   };
 
   return (
     <Suspense fallback={<Loader />}>
+      {/* Background stars */}
+      <Stars 
+        radius={100} 
+        depth={50} 
+        count={5000} 
+        factor={4} 
+        saturation={0.5} 
+        fade 
+        speed={1} 
+      />
+      
       {/* Ambient light for base illumination */}
-      <ambientLight intensity={0.3} />
+      <ambientLight intensity={0.5} />
       
       {/* Main light source at the center (sun) */}
-      <pointLight position={[0, 0, 0]} intensity={3} color="#FDB813" distance={100} decay={0.5} />
+      <pointLight position={[0, 0, 0]} intensity={5} color="#FDB813" distance={100} decay={0} />
       
       {/* Secondary lights for better visibility */}
-      <pointLight position={[20, 20, 20]} intensity={0.5} color="#FFFFFF" />
-      <pointLight position={[-20, -20, -20]} intensity={0.3} color="#FFF4E0" />
-      
-      {/* Background stars */}
-      <StarField count={7000} />
+      <directionalLight position={[10, 10, 5]} intensity={1} color="#FFFFFF" />
       
       <group ref={groupRef}>
         {/* Sun at the center */}
@@ -165,9 +129,9 @@ const SolarSystem = ({
               {/* Planet name */}
               {showOrbits && (
                 <Text
-                  position={[x, 0.5, z]}
+                  position={[x, 1, z]}
                   color="white"
-                  fontSize={0.5}
+                  fontSize={0.7}
                   anchorX="center"
                   anchorY="middle"
                   outlineWidth={0.05}

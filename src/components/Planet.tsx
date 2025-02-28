@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
@@ -26,10 +26,10 @@ const Planet = ({
   const getPlanetSize = () => {
     if (isRealisticScale) {
       // Use relative sizes based on Earth = 1
-      return planet.realSize * 0.2;
+      return planet.realSize * 0.3;
     } else {
       // Use visual sizes for better viewing
-      return planet.size;
+      return planet.size * 1.2; // Make planets bigger
     }
   };
 
@@ -60,11 +60,13 @@ const Planet = ({
           <ringGeometry args={[getPlanetSize() * 1.4, getPlanetSize() * 2, 64]} />
           <meshStandardMaterial 
             color="#E4D191" 
-            opacity={0.7} 
+            opacity={0.8} 
             transparent 
             side={THREE.DoubleSide}
-            metalness={0.4}
-            roughness={0.6}
+            metalness={0.3}
+            roughness={0.7}
+            emissive="#E4D191"
+            emissiveIntensity={0.1}
           />
         </mesh>
       );
@@ -80,11 +82,13 @@ const Planet = ({
           <ringGeometry args={[getPlanetSize() * 1.2, getPlanetSize() * 1.5, 64]} />
           <meshStandardMaterial 
             color={planet.color} 
-            opacity={0.4} 
+            opacity={0.6} 
             transparent 
             side={THREE.DoubleSide}
             metalness={0.3}
             roughness={0.7}
+            emissive={planet.color}
+            emissiveIntensity={0.1}
           />
         </mesh>
       );
@@ -105,6 +109,11 @@ const Planet = ({
           {/* Outer glow */}
           <mesh>
             <sphereGeometry args={[getPlanetSize() * 1.3, 32, 32]} />
+            <meshBasicMaterial color="#FDB813" opacity={0.2} transparent />
+          </mesh>
+          {/* Far outer glow */}
+          <mesh>
+            <sphereGeometry args={[getPlanetSize() * 1.8, 32, 32]} />
             <meshBasicMaterial color="#FDB813" opacity={0.1} transparent />
           </mesh>
         </>
@@ -129,14 +138,14 @@ const Planet = ({
       return (
         <mesh>
           <sphereGeometry args={[getPlanetSize() * 1.05, 32, 32]} />
-          <meshBasicMaterial color={color} opacity={0.2} transparent />
+          <meshBasicMaterial color={color} opacity={0.3} transparent />
         </mesh>
       );
     }
     return null;
   };
 
-  // Add surface details and texture-like effects
+  // Get planet material based on type
   const getPlanetMaterial = () => {
     if (planet.id === 'sun') {
       return (
@@ -154,7 +163,7 @@ const Planet = ({
           metalness={0.1}
           roughness={0.8}
           emissive={planet.color}
-          emissiveIntensity={0.05}
+          emissiveIntensity={0.2}
         />
       );
     } else if (['uranus', 'neptune'].includes(planet.id)) {
@@ -165,7 +174,7 @@ const Planet = ({
           metalness={0.3}
           roughness={0.6}
           emissive={planet.color}
-          emissiveIntensity={0.1}
+          emissiveIntensity={0.2}
         />
       );
     } else {
@@ -174,9 +183,9 @@ const Planet = ({
         <meshStandardMaterial 
           color={planet.color}
           metalness={0.2}
-          roughness={0.9}
+          roughness={0.8}
           emissive={planet.color}
-          emissiveIntensity={0.02}
+          emissiveIntensity={0.1}
         />
       );
     }
