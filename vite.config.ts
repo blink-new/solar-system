@@ -12,6 +12,8 @@ export default defineConfig({
       clientPort: 443,
       host: 'blink.new',
       protocol: 'wss'
-    }
+    },
+    // Allow all blink.new subdomains
+    allowedHosts: 'all'
   }
 })
