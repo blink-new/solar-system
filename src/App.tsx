@@ -70,10 +70,9 @@ function App() {
                     }}
                     gl={{ 
                       antialias: true,
-                      alpha: false,
-                      powerPreference: "high-performance"
+                      powerPreference: "default"
                     }}
-                    dpr={[1, 2]} // Responsive pixel ratio
+                    frameloop="demand"
                   >
                     <color attach="background" args={['#000000']} />
                     
@@ -90,7 +89,7 @@ function App() {
                       enableRotate={true}
                       minDistance={10}
                       maxDistance={100}
-                      dampingFactor={0.1}
+                      dampingFactor={0.05}
                       rotateSpeed={0.5}
                       zoomSpeed={0.8}
                     />

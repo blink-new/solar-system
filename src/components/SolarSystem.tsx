@@ -1,6 +1,6 @@
 import { useRef, Suspense } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Text, Html, useProgress, Stars } from '@react-three/drei';
+import { Text, Html, useProgress } from '@react-three/drei';
 import { usePlanets } from '../context/PlanetContext';
 import Planet from './Planet';
 import { ViewType } from '../types';
@@ -30,7 +30,7 @@ function Loader() {
 function OrbitPath({ radius, color }: { radius: number; color: string }) {
   return (
     <mesh rotation={[Math.PI / 2, 0, 0]}>
-      <ringGeometry args={[radius - 0.025, radius + 0.025, 128]} />
+      <ringGeometry args={[radius - 0.025, radius + 0.025, 64]} />
       <meshBasicMaterial 
         color={color} 
         opacity={0.4} 
@@ -38,6 +38,23 @@ function OrbitPath({ radius, color }: { radius: number; color: string }) {
         side={THREE.DoubleSide} 
       />
     </mesh>
+  );
+}
+
+// Simple star field
+function StarField() {
+  return (
+    <points>
+      <bufferGeometry>
+        <bufferAttribute
+          attach="attributes-position"
+          count={1000}
+          array={new Float32Array(3000).map(() => (Math.random() - 0.5) * 100)}
+          itemSize={3}
+        />
+      </bufferGeometry>
+      <pointsMaterial size={0.5} sizeAttenuation color="white" />
+    </points>
   );
 }
 
@@ -53,7 +70,7 @@ const SolarSystem = ({
   useFrame(({ clock }) => {
     if (groupRef.current) {
       // Slow rotation of the entire system for visual effect
-      groupRef.current.rotation.y = clock.getElapsedTime() * 0.03;
+      groupRef.current.rotation.y = clock.getElapsedTime() * 0.02;
     }
   });
 
@@ -75,25 +92,17 @@ const SolarSystem = ({
 
   return (
     <Suspense fallback={<Loader />}>
-      {/* Background stars */}
-      <Stars 
-        radius={100} 
-        depth={50} 
-        count={5000} 
-        factor={4} 
-        saturation={0.5} 
-        fade 
-        speed={1} 
-      />
+      {/* Simple star field */}
+      <StarField />
       
       {/* Ambient light for base illumination */}
-      <ambientLight intensity={0.5} />
+      <ambientLight intensity={0.8} />
       
       {/* Main light source at the center (sun) */}
-      <pointLight position={[0, 0, 0]} intensity={5} color="#FDB813" distance={100} decay={0} />
+      <pointLight position={[0, 0, 0]} intensity={2} color="#FDB813" />
       
-      {/* Secondary lights for better visibility */}
-      <directionalLight position={[10, 10, 5]} intensity={1} color="#FFFFFF" />
+      {/* Secondary light for better visibility */}
+      <directionalLight position={[10, 10, 5]} intensity={0.5} />
       
       <group ref={groupRef}>
         {/* Sun at the center */}
