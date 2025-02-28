@@ -18,9 +18,8 @@ export default defineConfig({
       usePolling: true,
     },
     hmr: {
-      clientPort: 443,
-      host: 'blink.new',
-      protocol: 'wss'
+      // Disable HMR for blink.new environment to prevent WebSocket errors
+      disable: true
     },
     allowedHosts: ['all', '.blink.new']
   },

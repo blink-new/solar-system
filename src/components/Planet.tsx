@@ -1,8 +1,8 @@
 import { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { useTexture } from '@react-three/drei';
-import { Planet as PlanetType } from '../types';
 import * as THREE from 'three';
+
+import { Planet as PlanetType } from '../types';
 
 interface PlanetProps {
   planet: PlanetType;
@@ -22,26 +22,14 @@ const Planet = ({
   const meshRef = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
   
-  // Placeholder texture until we have actual textures
-  const textureUrl = planet.id === 'sun' 
-    ? 'https://images.unsplash.com/photo-1575881875475-31023242e3f9?q=80&w=500&auto=format&fit=crop'
-    : planet.id === 'mercury'
-    ? 'https://images.unsplash.com/photo-1614732414444-096e5f1122d5?q=80&w=500&auto=format&fit=crop'
-    : planet.id === 'venus'
-    ? 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=500&auto=format&fit=crop'
-    : planet.id === 'earth'
-    ? 'https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?q=80&w=500&auto=format&fit=crop'
-    : planet.id === 'mars'
-    ? 'https://images.unsplash.com/photo-1573588028698-f4759befb09a?q=80&w=500&auto=format&fit=crop'
-    : planet.id === 'jupiter'
-    ? 'https://images.unsplash.com/photo-1630839437035-dac17da580d0?q=80&w=500&auto=format&fit=crop'
-    : planet.id === 'saturn'
-    ? 'https://images.unsplash.com/photo-1614314107768-6018061e5704?q=80&w=500&auto=format&fit=crop'
-    : planet.id === 'uranus'
-    ? 'https://images.unsplash.com/photo-1614313913007-2b4ae8ce32d6?q=80&w=500&auto=format&fit=crop'
-    : 'https://images.unsplash.com/photo-1614314107918-2163bd6c0b90?q=80&w=500&auto=format&fit=crop'; // neptune
-  
-  const texture = useTexture(textureUrl);
+  // Create a simple colored material instead of using textures
+  const material = planet.id === 'sun' 
+    ? new THREE.MeshBasicMaterial({ color: planet.color })
+    : new THREE.MeshStandardMaterial({ 
+        color: planet.color,
+        metalness: 0.2,
+        roughness: 0.8
+      });
 
   // Calculate planet size
   const getPlanetSize = () => {
@@ -122,16 +110,7 @@ const Planet = ({
         scale={hovered ? [1.1, 1.1, 1.1] : [1, 1, 1]}
       >
         <sphereGeometry args={[getPlanetSize(), 32, 32]} />
-        {planet.id === 'sun' ? (
-          <meshBasicMaterial map={texture} color={planet.color} />
-        ) : (
-          <meshStandardMaterial 
-            map={texture} 
-            color={planet.color} 
-            metalness={0.2} 
-            roughness={0.8} 
-          />
-        )}
+        {material}
       </mesh>
       {renderSaturnRings()}
       {renderPlanetaryRings()}
