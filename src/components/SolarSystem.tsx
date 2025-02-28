@@ -65,8 +65,8 @@ const SolarSystem = ({
           <group key={planet.id}>
             {/* Orbit path */}
             {showOrbits && (
-              <mesh>
-                <ringGeometry args={[orbitRadius, orbitRadius + 0.05, 64]} />
+              <mesh rotation={[Math.PI / 2, 0, 0]}>
+                <ringGeometry args={[orbitRadius - 0.025, orbitRadius + 0.025, 64]} />
                 <meshBasicMaterial color={planet.color} opacity={0.3} transparent side={THREE.DoubleSide} />
               </mesh>
             )}
