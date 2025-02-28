@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Stars } from '@react-three/drei';
-import { motion } from 'framer-motion';
+import { OrbitControls, Stars, Html, useProgress } from '@react-three/drei';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Info, ThermometerSun, Ruler, Clock, Satellite } from 'lucide-react';
 import { usePlanets } from '../context/PlanetContext';
 import Planet from './Planet';
@@ -12,10 +12,24 @@ interface PlanetDetailProps {
   isNightMode: boolean;
 }
 
+// Loading component for suspense fallback
+function Loader() {
+  const { progress } = useProgress();
+  return (
+    <Html center>
+      <div className="flex flex-col items-center justify-center text-white">
+        <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p className="text-lg font-semibold">{progress.toFixed(0)}% loaded</p>
+      </div>
+    </Html>
+  );
+}
+
 const PlanetDetail = ({ planetId, onBack, isNightMode }: PlanetDetailProps) => {
   const { getPlanetById } = usePlanets();
   const planet = getPlanetById(planetId);
   const [activeTab, setActiveTab] = useState<'overview' | 'facts' | 'composition'>('overview');
+  const [isRotating, setIsRotating] = useState(true);
 
   if (!planet) {
     return (
@@ -43,17 +57,21 @@ const PlanetDetail = ({ planetId, onBack, isNightMode }: PlanetDetailProps) => {
           <ambientLight intensity={isNightMode ? 0.1 : 0.5} />
           <pointLight position={[10, 10, 10]} intensity={isNightMode ? 1 : 2} />
           <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
-          <Planet 
-            planet={planet} 
-            onClick={() => {}} 
-            isRealisticScale={false}
-          />
+          <Suspense fallback={<Loader />}>
+            <Planet 
+              planet={planet} 
+              onClick={() => setIsRotating(!isRotating)} 
+              isRealisticScale={false}
+            />
+          </Suspense>
           <OrbitControls 
             enablePan={true}
             enableZoom={true}
             enableRotate={true}
             minDistance={5}
             maxDistance={20}
+            autoRotate={isRotating}
+            autoRotateSpeed={1}
           />
         </Canvas>
         <button 
@@ -62,6 +80,9 @@ const PlanetDetail = ({ planetId, onBack, isNightMode }: PlanetDetailProps) => {
         >
           <ArrowLeft size={24} />
         </button>
+        <div className="absolute bottom-4 left-4 text-sm text-white bg-indigo-800 bg-opacity-70 px-3 py-1 rounded-md">
+          Click the planet to {isRotating ? 'stop' : 'start'} rotation
+        </div>
       </div>
 
       {/* Planet Information */}
@@ -96,29 +117,48 @@ const PlanetDetail = ({ planetId, onBack, isNightMode }: PlanetDetailProps) => {
           </div>
           
           {/* Tab Content */}
-          <div className="space-y-6">
+          <AnimatePresence mode="wait">
             {activeTab === 'overview' && (
-              <>
+              <motion.div
+                key="overview"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-6"
+              >
                 <p className="text-lg">{planet.description}</p>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                  <div className="bg-indigo-800 bg-opacity-50 p-4 rounded-lg flex items-center">
+                  <motion.div 
+                    className="bg-indigo-800 bg-opacity-50 p-4 rounded-lg flex items-center"
+                    whileHover={{ scale: 1.03 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                  >
                     <Ruler className="mr-3 text-yellow-400" size={24} />
                     <div>
                       <h3 className="text-sm text-gray-300">Diameter</h3>
                       <p className="text-lg font-semibold">{formatNumber(planet.diameter)} km</p>
                     </div>
-                  </div>
+                  </motion.div>
                   
-                  <div className="bg-indigo-800 bg-opacity-50 p-4 rounded-lg flex items-center">
+                  <motion.div 
+                    className="bg-indigo-800 bg-opacity-50 p-4 rounded-lg flex items-center"
+                    whileHover={{ scale: 1.03 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                  >
                     <ThermometerSun className="mr-3 text-yellow-400" size={24} />
                     <div>
                       <h3 className="text-sm text-gray-300">Average Temperature</h3>
                       <p className="text-lg font-semibold">{planet.temperature.avg}°C</p>
                     </div>
-                  </div>
+                  </motion.div>
                   
-                  <div className="bg-indigo-800 bg-opacity-50 p-4 rounded-lg flex items-center">
+                  <motion.div 
+                    className="bg-indigo-800 bg-opacity-50 p-4 rounded-lg flex items-center"
+                    whileHover={{ scale: 1.03 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                  >
                     <Clock className="mr-3 text-yellow-400" size={24} />
                     <div>
                       <h3 className="text-sm text-gray-300">Orbital Period</h3>
@@ -128,15 +168,19 @@ const PlanetDetail = ({ planetId, onBack, isNightMode }: PlanetDetailProps) => {
                           : `${formatNumber(planet.orbitalPeriod)} Earth days`}
                       </p>
                     </div>
-                  </div>
+                  </motion.div>
                   
-                  <div className="bg-indigo-800 bg-opacity-50 p-4 rounded-lg flex items-center">
+                  <motion.div 
+                    className="bg-indigo-800 bg-opacity-50 p-4 rounded-lg flex items-center"
+                    whileHover={{ scale: 1.03 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                  >
                     <Satellite className="mr-3 text-yellow-400" size={24} />
                     <div>
                       <h3 className="text-sm text-gray-300">Moons</h3>
                       <p className="text-lg font-semibold">{planet.moons}</p>
                     </div>
-                  </div>
+                  </motion.div>
                 </div>
                 
                 <div className="mt-6">
@@ -163,11 +207,18 @@ const PlanetDetail = ({ planetId, onBack, isNightMode }: PlanetDetailProps) => {
                     </li>
                   </ul>
                 </div>
-              </>
+              </motion.div>
             )}
             
             {activeTab === 'facts' && (
-              <div className="space-y-4">
+              <motion.div
+                key="facts"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-4"
+              >
                 <h2 className="text-xl font-semibold flex items-center">
                   <Info className="mr-2 text-yellow-400" size={20} />
                   Fun Facts about {planet.name}
@@ -180,21 +231,32 @@ const PlanetDetail = ({ planetId, onBack, isNightMode }: PlanetDetailProps) => {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ duration: 0.3, delay: index * 0.1 }}
                       className="bg-indigo-800 bg-opacity-50 p-3 rounded-lg"
+                      whileHover={{ scale: 1.02, backgroundColor: 'rgba(79, 70, 229, 0.4)' }}
                     >
                       {fact}
                     </motion.li>
                   ))}
                 </ul>
-              </div>
+              </motion.div>
             )}
             
             {activeTab === 'composition' && (
-              <div className="space-y-4">
+              <motion.div
+                key="composition"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-4"
+              >
                 <div>
                   <h2 className="text-xl font-semibold mb-2">Planet Type</h2>
-                  <p className="bg-indigo-800 bg-opacity-50 p-3 rounded-lg">
+                  <motion.p 
+                    className="bg-indigo-800 bg-opacity-50 p-3 rounded-lg"
+                    whileHover={{ scale: 1.02 }}
+                  >
                     {planet.composition.type}
-                  </p>
+                  </motion.p>
                 </div>
                 
                 <div>
@@ -207,6 +269,7 @@ const PlanetDetail = ({ planetId, onBack, isNightMode }: PlanetDetailProps) => {
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.3, delay: index * 0.1 }}
                         className="bg-indigo-800 bg-opacity-50 p-2 rounded-lg text-center"
+                        whileHover={{ scale: 1.05, backgroundColor: 'rgba(79, 70, 229, 0.4)' }}
                       >
                         {gas}
                       </motion.div>
@@ -227,9 +290,9 @@ const PlanetDetail = ({ planetId, onBack, isNightMode }: PlanetDetailProps) => {
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             )}
-          </div>
+          </AnimatePresence>
         </motion.div>
       </div>
     </div>
