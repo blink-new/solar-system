@@ -1,50 +1,47 @@
-# React + TypeScript + Vite
+# Solar System Explorer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+An interactive educational app designed to teach children about our solar system. The app features a beautiful 3D visualization of the solar system with detailed information about each planet, interactive elements, and educational quizzes.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Interactive 3D Solar System**: Explore a visually stunning 3D model of our solar system with all planets orbiting the sun
+- **Detailed Planet Information**: Learn fascinating facts about each planet including size, temperature, composition, and more
+- **Educational Quiz**: Test your knowledge with fun quizzes about the planets and solar system
+- **Visual Settings**: Toggle between day/night mode, show/hide orbits, and switch between visual and realistic scale
 
-## Expanding the ESLint configuration
+## Technologies Used
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- React with TypeScript
+- Three.js (via React Three Fiber) for 3D visualization
+- Framer Motion for animations
+- Tailwind CSS for styling
 
-- Configure the top-level `parserOptions` property like this:
+## Getting Started
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+1. Clone the repository
+2. Install dependencies: `npm install`
+3. Start the development server: `npm run dev`
+4. Open your browser to the URL shown in the terminal
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+## Usage
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+- **Solar System View**: Explore the 3D model of the solar system. Click on any planet to view detailed information.
+- **Planet Detail View**: Learn about each planet's characteristics, fun facts, and composition.
+- **Quiz Mode**: Test your knowledge with interactive quizzes about the solar system.
+- **Settings**:
+  - Toggle orbit paths visibility
+  - Switch between day and night mode
+  - Toggle between visual and realistic scale
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+## Educational Value
+
+This app is designed to make learning about the solar system fun and engaging for children. It combines visual learning with interactive elements to help kids understand:
+
+- The structure of our solar system
+- The unique characteristics of each planet
+- Scientific facts presented in an age-appropriate way
+- Spatial relationships between celestial bodies
+
+## License
+
+MIT
