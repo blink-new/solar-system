@@ -4,6 +4,7 @@ import { Text } from '@react-three/drei';
 import { usePlanets } from '../context/PlanetContext';
 import Planet from './Planet';
 import { ViewType } from '../types';
+import * as THREE from 'three';
 
 interface SolarSystemProps {
   setSelectedPlanet: (id: string) => void;
@@ -64,32 +65,10 @@ const SolarSystem = ({
           <group key={planet.id}>
             {/* Orbit path */}
             {showOrbits && (
-              <line>
-                <bufferGeometry attach="geometry">
-                  <float32BufferAttribute 
-                    attach="attributes-position" 
-                    array={new Float32Array(
-                      Array.from({ length: 64 + 1 }).flatMap((_, i) => {
-                        const angle = (i / 64) * Math.PI * 2;
-                        return [
-                          Math.sin(angle) * orbitRadius,
-                          0,
-                          Math.cos(angle) * orbitRadius
-                        ];
-                      })
-                    )} 
-                    count={65} 
-                    itemSize={3} 
-                  />
-                </bufferGeometry>
-                <lineBasicMaterial 
-                  attach="material" 
-                  color={planet.color} 
-                  opacity={0.3} 
-                  transparent 
-                  linewidth={1} 
-                />
-              </line>
+              <mesh>
+                <ringGeometry args={[orbitRadius, orbitRadius + 0.05, 64]} />
+                <meshBasicMaterial color={planet.color} opacity={0.3} transparent side={THREE.DoubleSide} />
+              </mesh>
             )}
             
             {/* Planet with orbit animation */}
