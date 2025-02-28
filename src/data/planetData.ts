@@ -124,7 +124,7 @@ export const planetData: Planet[] = [
     funFacts: [
       'Earth is the only planet not named after a god.',
       'Earth is the densest planet in the Solar System.',
-      'Earth's rotation is gradually slowing down.',
+      'Earth rotation is gradually slowing down.',
       'Earth has a powerful magnetic field that protects us from the solar wind.'
     ],
     composition: {
@@ -192,7 +192,7 @@ export const planetData: Planet[] = [
     funFacts: [
       'Jupiter has the shortest day of all the planets, rotating once every 9.8 hours.',
       'Jupiter has the Great Red Spot, a giant storm that has been raging for hundreds of years.',
-      'Jupiter has a very strong magnetic field, 14 times stronger than Earth's.',
+      'Jupiter has a very strong magnetic field, 14 times stronger than Earth\'s.',
       'Jupiter has at least 79 moons, the most of any planet in our solar system.'
     ],
     composition: {
@@ -294,7 +294,7 @@ export const planetData: Planet[] = [
     funFacts: [
       'Neptune has the strongest winds in the solar system, reaching speeds of 2,100 km/h.',
       'Neptune was predicted to exist through mathematical calculations before it was actually observed.',
-      'Neptune has a Great Dark Spot, similar to Jupiter's Great Red Spot.',
+      'Neptune has a Great Dark Spot, similar to Jupiter\'s Great Red Spot.',
       'A year on Neptune lasts 165 Earth years.'
     ],
     composition: {
